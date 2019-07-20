@@ -1,5 +1,5 @@
-from microchain.block import Block
-from microchain.blockchain import Blockchain
+from blockchain_poc.block import Block
+from blockchain_poc.blockchain import Blockchain
 
 chain = Blockchain()
 new_block = Block(
@@ -9,6 +9,6 @@ new_block = Block(
         "Hello, world!",
         1,
         19)
-chain.add_block(new_block)
-print(repr(chain.get_latest_block()))
+chain.add_data("Hello, world!")
+chain.add_data("A" * 64)
 
