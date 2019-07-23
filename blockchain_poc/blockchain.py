@@ -1,5 +1,7 @@
 from copy import deepcopy
 import time
+import datetime
+import json
 from .block import Block
 
 BLOCK_GENERATION_INTERVAL = 10          # 10 seconds
@@ -37,6 +39,7 @@ class Blockchain(object):
                     difficulty,
                     nonce)
 
+            print(datetime.datetime.now(), nonce, new_block.hash.hex(), flush=True) # DEBUG
 
             if self.__validate_hash(new_block.hash, difficulty):
                 self.__blocks.append(new_block)
@@ -60,6 +63,27 @@ class Blockchain(object):
         else:
             return latest_block.difficulty
 
+    def load_from_json(self, json_string):
+        data = json.loads(json_string)
+
+        for block_json in data:
+            index = block_json["index"]
+            hash = bytes.fromhex(block_json["hash"])
+            prev = bytes.fromhex(block_json["prev"])
+            timestamp = block_json["timestamp"]
+            data = block_json["data"]
+            difficulty = block_json["difficulty"]
+            nonce = block_json["nonce"]
+
+            block = Block(
+                    index,
+                    prev,
+                    timestamp,
+                    data,
+                    difficulty,
+                    nonce)
+            self.add_block(block)
+
     def __get_adjusted_difficulty(self):
         prev_adjustment_block = self.__blocks[len(self) - \
                 DIFFICULTY_ADJUSTMENT_INTERVAL]
@@ -73,6 +97,9 @@ class Blockchain(object):
             return prev_adjustment_block.difficulty - 1
         else:
             return prev_adjustment_block.difficulty
+
+    def as_json(self):
+        return json.dumps([block.as_dict() for block in self.__blocks])
 
     def __len__(self):
         return len(self.__blocks)

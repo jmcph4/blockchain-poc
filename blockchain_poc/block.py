@@ -2,6 +2,7 @@ from copy import deepcopy
 import hashlib
 import datetime
 import time
+import json
 
 CLOCK_DRIFT_TOLERANCE = 0.01 # 1% clock drift in the future
 
@@ -132,4 +133,25 @@ class Block(object):
                         self.difficulty,
                         self.nonce,
                         self.data)
+
+    def as_json(self):
+        return json.dumps(self.as_dict())
+
+    def as_dict(self):
+        data_field = None
+
+        if isinstance(self.data, bytes):
+            data_field = self.data.hex()
+        else:
+            data_field = self.data
+
+        return {
+                "index": self.index,
+                "hash": self.hash.hex(),
+                "prev": self.prev.hex(),
+                "timestamp": self.timestamp,
+                "data": data_field,
+                "difficulty": self.difficulty,
+                "nonce": self.nonce
+                }
 
